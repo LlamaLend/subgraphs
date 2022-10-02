@@ -1,56 +1,88 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import {
-  LlamaLendFactory,
-  OwnershipTransferred,
   PoolCreated
 } from "../generated/LlamaLendFactory/LlamaLendFactory"
-import { ExampleEntity } from "../generated/schema"
+import {
+  LoanCreated,
+  Transfer
+} from "../generated/templates/LlamaLend/LlamaLend"
+import { LlamaLendContract, LlamaLendFactory, Loan, User } from "../generated/schema"
+import {LlamaLend} from "../generated/templates"
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+export function handlePoolCreated(event: PoolCreated): void {
+  const factoryAddress = event.address;
+  const nftContract = event.params.nftContract;
+  const poolAddress = event.params.pool;
+  const block = event.block.number;
+  const timestamp = event.block.timestamp;
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
+  // Load Factory
+  let factory = LlamaLendFactory.load(factoryAddress.toHexString());
 
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+  // Create new Factory entity with info if null
+  if (factory === null) {
+    factory = new LlamaLendFactory(factoryAddress.toHexString());
+    factory.address = factoryAddress;
+    factory.createdTimestamp = timestamp;
+    factory.createdBlock = block;
   }
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
+  // Create new contract entity and fill with info
+  let contract = new LlamaLendContract(poolAddress.toHexString());
+  contract.address = poolAddress;
+  contract.factory = factory.id;
+  contract.nftContract = nftContract;
+  contract.createdTimestamp = timestamp;
+  contract.createdBlock = block;
 
-  // Entity fields can be set based on event parameters
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
+  // Start tracking the llamapay contract
+  LlamaLend.create(poolAddress);
 
-  // Entities can be written to the store with `.save()`
-  entity.save()
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
-
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.allPools(...)
-  // - contract.allPoolsLength(...)
-  // - contract.createPool(...)
-  // - contract.nftPools(...)
-  // - contract.nftPoolsLength(...)
-  // - contract.owner(...)
+  //Savooooor
+  factory.save();
+  contract.save();
 }
 
-export function handlePoolCreated(event: PoolCreated): void {}
+export function handleTransfer(event: Transfer): void {
+  let loanId = event.params.tokenId;
+  const block = event.block.number;
+  const timestamp = event.block.timestamp;
+  const newOwner = event.params.to;
+
+  const loan = Loan.load(loanId.toHexString());
+
+  let user = User.load(newOwner.toHexString());
+    // If User doesn't exist, then create a new User entity
+    if (user === null) {
+        user = new User(newOwner.toHexString());
+        user.address = newOwner;
+        user.createdTimestamp = timestamp;
+        user.createdBlock = block;
+    }
+    loan!.owner = user.id;
+    // Save and return
+    user.save();
+    loan!.save();
+}
+
+export function handleLoanCreated(event: LoanCreated): void {
+  const poolAddress = event.address;
+  const loanId = event.params.loanId;
+  const nft = event.params.nft;
+  const interest = event.params.interest;
+  const startTime = event.params.startTime;
+  const borrowed = event.params.borrowed;
+  const block = event.block.number;
+  let pool = LlamaLendContract.load(poolAddress.toHexString());
+
+  let loan = new Loan(loanId.toHexString());
+  loan.loanId = loanId;
+  loan.nftId = nft;
+  loan.interest = interest;
+  loan.borrowed = borrowed;
+  loan.startTime = startTime;
+  loan.createdBlock = block;
+  loan.pool = pool!.id;
+
+  loan.save();
+}

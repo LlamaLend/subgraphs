@@ -1,6 +1,38 @@
-type ExampleEntity @entity {
+type LlamaLendFactory @entity {
   id: ID!
-  count: BigInt!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
+  count: Int!
+  address: Bytes!
+  contracts: [LlamaLendContract!]! @derivedFrom(field: "factory")
+  createdTimestamp: BigInt!
+  createdBlock: BigInt!
+}
+
+type LlamaLendContract @entity {
+  id: ID!
+  address: Bytes!
+  nftContract: Bytes!
+  factory: LlamaLendFactory!
+  loans: [Loan!]! @derivedFrom(field: "pool")
+  createdTimestamp: BigInt!
+  createdBlock: BigInt!
+}
+
+type Loan @entity {
+  id: ID!
+  loanId: BigInt!
+  pool: LlamaLendContract!
+  owner: User
+  nftId: BigInt!
+  interest: BigInt!
+  borrowed: BigInt!
+  startTime: BigInt!
+  createdBlock: BigInt!
+}
+
+type User @entity {
+  id: ID!
+  address: Bytes!
+  loans: [Loan!]! @derivedFrom(field: "owner")
+  createdTimestamp: BigInt!
+  createdBlock: BigInt!
 }

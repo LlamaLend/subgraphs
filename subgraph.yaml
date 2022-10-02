@@ -1,0 +1,26 @@
+specVersion: 0.0.1
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: LlamaLendFactory
+    network: goerli
+    source:
+      address: "0x90F1963153E29E87Cd4A58cBB7850ED96FDEA050"
+      abi: LlamaLendFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - OwnershipTransferred
+        - PoolCreated
+      abis:
+        - name: LlamaLendFactory
+          file: ./abis/LlamaLendFactory.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PoolCreated(indexed address,indexed address,address,uint256)
+          handler: handlePoolCreated
+      file: ./src/mapping.ts

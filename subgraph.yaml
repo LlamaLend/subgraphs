@@ -43,4 +43,10 @@ templates:
           handler: handleLoanCreated
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: LiquidatorAdded(address)
+          handler: handleLiquidatorAdded
+        - event: LiquidatorRemoved(address)
+          handler: handleLiquidatorRemoved
       file: ./src/mapping.ts

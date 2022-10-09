@@ -1,16 +1,36 @@
 [
   {
     "inputs": [
-      { "internalType": "address", "name": "_oracle", "type": "address" },
-      { "internalType": "uint256", "name": "_maxPrice", "type": "uint256" },
-      { "internalType": "address", "name": "_nftContract", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "_oracle",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_nftContract",
+        "type": "address"
+      },
       {
         "internalType": "uint256",
         "name": "_maxDailyBorrows",
         "type": "uint256"
       },
-      { "internalType": "string", "name": "_name", "type": "string" },
-      { "internalType": "string", "name": "_symbol", "type": "string" },
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_symbol",
+        "type": "string"
+      },
       {
         "internalType": "uint256",
         "name": "_maxLoanLength",
@@ -18,7 +38,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_maxInterestPerEthPerSecond",
+        "name": "_maxVariableInterestPerEthPerSecond",
         "type": "uint256"
       },
       {
@@ -26,7 +46,16 @@
         "name": "_minimumInterest",
         "type": "uint256"
       },
-      { "internalType": "address", "name": "_owner", "type": "address" }
+      {
+        "internalType": "uint256",
+        "name": "_ltv",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_owner",
+        "type": "address"
+      }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -98,6 +127,32 @@
       }
     ],
     "name": "Borrowed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "liquidator",
+        "type": "address"
+      }
+    ],
+    "name": "LiquidatorAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "liquidator",
+        "type": "address"
+      }
+    ],
+    "name": "LiquidatorRemoved",
     "type": "event"
   },
   {
@@ -200,9 +255,18 @@
     "name": "Transfer",
     "type": "event"
   },
-  { "stateMutability": "nonpayable", "type": "fallback" },
   {
-    "inputs": [{ "internalType": "address", "name": "liq", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "fallback"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "liq",
+        "type": "address"
+      }
+    ],
     "name": "addLiquidator",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -210,8 +274,16 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "approve",
     "outputs": [],
@@ -220,22 +292,65 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
     ],
     "name": "balanceOf",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256[]", "name": "nftId", "type": "uint256[]" },
-      { "internalType": "uint216", "name": "price", "type": "uint216" },
-      { "internalType": "uint256", "name": "deadline", "type": "uint256" },
-      { "internalType": "uint256", "name": "maxInterest", "type": "uint256" },
-      { "internalType": "uint8", "name": "v", "type": "uint8" },
-      { "internalType": "bytes32", "name": "r", "type": "bytes32" },
-      { "internalType": "bytes32", "name": "s", "type": "bytes32" }
+      {
+        "internalType": "uint256[]",
+        "name": "nftId",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint216",
+        "name": "price",
+        "type": "uint216"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "maxInterest",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalToBorrow",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
+      }
     ],
     "name": "borrow",
     "outputs": [],
@@ -262,39 +377,48 @@
   },
   {
     "inputs": [
-      { "internalType": "uint216", "name": "price", "type": "uint216" },
-      { "internalType": "uint256", "name": "deadline", "type": "uint256" },
-      { "internalType": "uint8", "name": "v", "type": "uint8" },
-      { "internalType": "bytes32", "name": "r", "type": "bytes32" },
-      { "internalType": "bytes32", "name": "s", "type": "bytes32" }
+      {
+        "internalType": "uint256",
+        "name": "_ltv",
+        "type": "uint256"
+      }
     ],
-    "name": "checkOracle",
+    "name": "changeLTV",
     "outputs": [],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [
       {
-        "components": [
-          { "internalType": "uint256", "name": "nft", "type": "uint256" },
-          { "internalType": "uint256", "name": "interest", "type": "uint256" },
-          { "internalType": "uint40", "name": "startTime", "type": "uint40" },
-          { "internalType": "uint216", "name": "borrowed", "type": "uint216" }
-        ],
-        "internalType": "struct LendingPool.Loan",
-        "name": "loan",
-        "type": "tuple"
+        "internalType": "uint216",
+        "name": "price",
+        "type": "uint216"
       },
       {
         "internalType": "uint256",
-        "name": "liquidatorIndex",
+        "name": "deadline",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint8",
+        "name": "v",
+        "type": "uint8"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "r",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "s",
+        "type": "bytes32"
       }
     ],
-    "name": "claw",
+    "name": "checkOracle",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -307,7 +431,11 @@
     ],
     "name": "currentAnnualInterest",
     "outputs": [
-      { "internalType": "uint256", "name": "interest", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "interest",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -320,6 +448,46 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "nft",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "interest",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint40",
+            "name": "startTime",
+            "type": "uint40"
+          },
+          {
+            "internalType": "uint216",
+            "name": "borrowed",
+            "type": "uint216"
+          }
+        ],
+        "internalType": "struct LendingPool.Loan",
+        "name": "loan",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      }
+    ],
+    "name": "doEffectiveAltruism",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "emergencyShutdown",
     "outputs": [],
@@ -329,16 +497,32 @@
   {
     "inputs": [],
     "name": "factory",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "getApproved",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -351,7 +535,11 @@
         "name": "maxInstantBorrow",
         "type": "uint256"
       },
-      { "internalType": "uint256", "name": "dailyBorrows", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "dailyBorrows",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "maxDailyBorrowsLimit",
@@ -363,13 +551,35 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "nftId", "type": "uint256" },
-      { "internalType": "uint256", "name": "interest", "type": "uint256" },
-      { "internalType": "uint256", "name": "startTime", "type": "uint256" },
-      { "internalType": "uint216", "name": "price", "type": "uint216" }
+      {
+        "internalType": "uint256",
+        "name": "nftId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "interest",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint216",
+        "name": "price",
+        "type": "uint216"
+      }
     ],
     "name": "getLoanId",
-    "outputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "pure",
     "type": "function"
   },
@@ -377,10 +587,26 @@
     "inputs": [
       {
         "components": [
-          { "internalType": "uint256", "name": "nft", "type": "uint256" },
-          { "internalType": "uint256", "name": "interest", "type": "uint256" },
-          { "internalType": "uint40", "name": "startTime", "type": "uint40" },
-          { "internalType": "uint216", "name": "borrowed", "type": "uint216" }
+          {
+            "internalType": "uint256",
+            "name": "nft",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "interest",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint40",
+            "name": "startTime",
+            "type": "uint40"
+          },
+          {
+            "internalType": "uint216",
+            "name": "borrowed",
+            "type": "uint216"
+          }
         ],
         "internalType": "struct LendingPool.Loan",
         "name": "loan",
@@ -389,71 +615,153 @@
     ],
     "name": "infoToRepayLoan",
     "outputs": [
-      { "internalType": "uint256", "name": "deadline", "type": "uint256" },
-      { "internalType": "uint256", "name": "totalRepay", "type": "uint256" },
-      { "internalType": "uint256", "name": "principal", "type": "uint256" },
-      { "internalType": "uint256", "name": "interest", "type": "uint256" },
-      { "internalType": "uint256", "name": "lateFees", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalRepay",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "principal",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "interest",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "lateFees",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "owner", "type": "address" },
-      { "internalType": "address", "name": "operator", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
     ],
     "name": "isApprovedForAll",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "name": "liquidators",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "liquidatorsLength",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "maxInterestPerEthPerSecond",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "ltv",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "maxLoanLength",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "maxPrice",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxVariableInterestPerEthPerSecond",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "minimumInterest",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "name",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -461,7 +769,11 @@
     "inputs": [],
     "name": "nftContract",
     "outputs": [
-      { "internalType": "contract IERC721", "name": "", "type": "address" }
+      {
+        "internalType": "contract IERC721",
+        "name": "",
+        "type": "address"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -469,29 +781,55 @@
   {
     "inputs": [],
     "name": "oracle",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "ownerOf",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "index", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "liq",
+        "type": "address"
+      }
     ],
     "name": "removeLiquidator",
     "outputs": [],
@@ -509,10 +847,26 @@
     "inputs": [
       {
         "components": [
-          { "internalType": "uint256", "name": "nft", "type": "uint256" },
-          { "internalType": "uint256", "name": "interest", "type": "uint256" },
-          { "internalType": "uint40", "name": "startTime", "type": "uint40" },
-          { "internalType": "uint216", "name": "borrowed", "type": "uint216" }
+          {
+            "internalType": "uint256",
+            "name": "nft",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "interest",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint40",
+            "name": "startTime",
+            "type": "uint40"
+          },
+          {
+            "internalType": "uint216",
+            "name": "borrowed",
+            "type": "uint216"
+          }
         ],
         "internalType": "struct LendingPool.Loan[]",
         "name": "loansToRepay",
@@ -526,9 +880,21 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "from", "type": "address" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "safeTransferFrom",
     "outputs": [],
@@ -537,10 +903,26 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "from", "type": "address" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
-      { "internalType": "bytes", "name": "_data", "type": "bytes" }
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_data",
+        "type": "bytes"
+      }
     ],
     "name": "safeTransferFrom",
     "outputs": [],
@@ -549,19 +931,18 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "operator", "type": "address" },
-      { "internalType": "bool", "name": "approved", "type": "bool" }
+      {
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "approved",
+        "type": "bool"
+      }
     ],
     "name": "setApprovalForAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "string", "name": "newBaseURI", "type": "string" }
-    ],
-    "name": "setBaseURI",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -581,7 +962,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "newMaxPrice", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "newMaxPrice",
+        "type": "uint256"
+      }
     ],
     "name": "setMaxPrice",
     "outputs": [],
@@ -590,7 +975,11 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "newValue", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "newValue",
+        "type": "address"
+      }
     ],
     "name": "setOracle",
     "outputs": [],
@@ -599,41 +988,85 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
     ],
     "name": "supportsInterface",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "symbol",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "tokenURI",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "totalBorrowed",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "from", "type": "address" },
-      { "internalType": "address", "name": "to", "type": "address" },
-      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
     "name": "transferFrom",
     "outputs": [],
@@ -642,7 +1075,11 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
     "name": "transferOwnership",
     "outputs": [],
@@ -651,7 +1088,11 @@
   },
   {
     "inputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
     ],
     "name": "withdraw",
     "outputs": [],

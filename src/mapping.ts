@@ -1,14 +1,18 @@
 import { BigInt } from "@graphprotocol/graph-ts"
 import {
+  OwnershipTransferred,
   PoolCreated
 } from "../generated/LlamaLendFactory/LlamaLendFactory"
 import {
   LoanCreated,
   Transfer,
-  LlamaLend as LlamaLendToCall
+  LlamaLend as LlamaLendToCall,
+  LiquidatorAdded,
+  LiquidatorRemoved
 } from "../generated/templates/LlamaLend/LlamaLend"
-import { LlamaLendContract, LlamaLendFactory, Loan, User } from "../generated/schema"
+import { LlamaLendContract, LlamaLendFactory, Loan, User, Liquidator } from "../generated/schema"
 import {LlamaLend} from "../generated/templates"
+import { store } from '@graphprotocol/graph-ts'
 
 export function handlePoolCreated(event: PoolCreated): void {
   const factoryAddress = event.address;
@@ -33,6 +37,7 @@ export function handlePoolCreated(event: PoolCreated): void {
   contract.address = poolAddress;
   contract.factory = factory.id;
   contract.nftContract = nftContract;
+  contract.owner = event.params.owner;
   contract.createdTimestamp = timestamp;
   contract.createdBlock = block;
 
@@ -46,6 +51,13 @@ export function handlePoolCreated(event: PoolCreated): void {
   //Savooooor
   factory.save();
   contract.save();
+}
+export function handleOwnershipTransferred(event: OwnershipTransferred): void {
+  let pool = LlamaLendContract.load(event.address.toHexString());
+  if(pool !== null){
+    pool.owner = event.params.newOwner;
+    pool.save();
+  }
 }
 
 export function handleTransfer(event: Transfer): void {
@@ -95,4 +107,25 @@ export function handleLoanCreated(event: LoanCreated): void {
   loan.pool = pool!.id;
 
   loan.save();
+}
+
+export function handleLiquidatorAdded(event: LiquidatorAdded): void {
+  let pool = event.address
+  let liqAddress = event.params.liquidator
+  let id = `${pool}-${liqAddress}`
+  let liquidator = Liquidator.load(id)
+  if(liquidator !== null){
+    liquidator.address = liqAddress
+    liquidator.pool = LlamaLendContract.load(pool.toHexString())!.id;
+    liquidator.save();
+  }
+}
+
+export function handleLiquidatorRemoved(event: LiquidatorRemoved): void {
+  let pool = event.address
+  let id = `${pool}-${event.params.liquidator}`
+  let liquidator = Liquidator.load(id)
+  if(liquidator !== null){
+    store.remove('Liquidator', id)
+  }
 }

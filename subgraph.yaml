@@ -6,7 +6,7 @@ dataSources:
     name: LlamaLendFactory
     network: goerli
     source:
-      address: "0x973bf562407766e77f885c1cd1a8060e5303C745"
+      address: "0x299127928B6Fe8e6702Cebc737D43Dba8FEfe081"
       abi: LlamaLendFactory
     mapping:
       kind: ethereum/events

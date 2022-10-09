@@ -13,6 +13,7 @@ type LlamaLendContract @entity {
   nftContract: Bytes!
   factory: LlamaLendFactory!
   loans: [Loan!]! @derivedFrom(field: "pool")
+  maxLoanLength: BigInt!
   createdTimestamp: BigInt!
   createdBlock: BigInt!
 }
@@ -21,12 +22,15 @@ type Loan @entity {
   id: ID!
   loanId: BigInt!
   pool: LlamaLendContract!
+  originalOwner: Bytes
   owner: User
   nftId: BigInt!
   interest: BigInt!
   borrowed: BigInt!
   startTime: BigInt!
+  deadline: BigInt!
   createdBlock: BigInt!
+  tokenUri: String!
 }
 
 type User @entity {

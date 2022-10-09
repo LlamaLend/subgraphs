@@ -4,7 +4,8 @@ import {
 } from "../generated/LlamaLendFactory/LlamaLendFactory"
 import {
   LoanCreated,
-  Transfer
+  Transfer,
+  LlamaLend as LlamaLendToCall
 } from "../generated/templates/LlamaLend/LlamaLend"
 import { LlamaLendContract, LlamaLendFactory, Loan, User } from "../generated/schema"
 import {LlamaLend} from "../generated/templates"
@@ -35,6 +36,10 @@ export function handlePoolCreated(event: PoolCreated): void {
   contract.createdTimestamp = timestamp;
   contract.createdBlock = block;
 
+  let contractToCall = LlamaLendToCall.bind(poolAddress)
+  let callResult = contractToCall.maxLoanLength()
+  contract.maxLoanLength = callResult;
+
   // Start tracking the llamapay contract
   LlamaLend.create(poolAddress);
 
@@ -52,17 +57,20 @@ export function handleTransfer(event: Transfer): void {
   const loan = Loan.load(loanId.toHexString());
 
   let user = User.load(newOwner.toHexString());
-    // If User doesn't exist, then create a new User entity
-    if (user === null) {
-        user = new User(newOwner.toHexString());
-        user.address = newOwner;
-        user.createdTimestamp = timestamp;
-        user.createdBlock = block;
-    }
-    loan!.owner = user.id;
-    // Save and return
-    user.save();
-    loan!.save();
+  // If User doesn't exist, then create a new User entity
+  if (user === null) {
+      user = new User(newOwner.toHexString());
+      user.address = newOwner;
+      user.createdTimestamp = timestamp;
+      user.createdBlock = block;
+  }
+  if(loan!.owner === null){
+    loan!.originalOwner = user.address;
+  }
+  loan!.owner = user.id;
+  // Save and return
+  user.save();
+  loan!.save();
 }
 
 export function handleLoanCreated(event: LoanCreated): void {
@@ -82,6 +90,8 @@ export function handleLoanCreated(event: LoanCreated): void {
   loan.borrowed = borrowed;
   loan.startTime = startTime;
   loan.createdBlock = block;
+  loan.deadline = startTime.plus(pool!.maxLoanLength);
+  loan.tokenUri = `https://nft.llamalend.com/nft/5/${pool!.address.toHexString().toLowerCase()}/${pool!.nftContract.toHexString().toLowerCase()}/${loanId.toString()}`;
   loan.pool = pool!.id;
 
   loan.save();

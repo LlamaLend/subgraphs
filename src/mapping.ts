@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts"
 import {
   OwnershipTransferred,
   PoolCreated
@@ -10,7 +9,7 @@ import {
   LiquidatorAdded,
   LiquidatorRemoved
 } from "../generated/templates/LlamaLend/LlamaLend"
-import { LlamaLendContract, LlamaLendFactory, Loan, User, Liquidator } from "../generated/schema"
+import { Pool, Factory, Loan, Liquidator } from "../generated/schema"
 import {LlamaLend} from "../generated/templates"
 import { store } from '@graphprotocol/graph-ts'
 
@@ -22,18 +21,18 @@ export function handlePoolCreated(event: PoolCreated): void {
   const timestamp = event.block.timestamp;
 
   // Load Factory
-  let factory = LlamaLendFactory.load(factoryAddress.toHexString());
+  let factory = Factory.load(factoryAddress.toHexString());
 
   // Create new Factory entity with info if null
   if (factory === null) {
-    factory = new LlamaLendFactory(factoryAddress.toHexString());
+    factory = new Factory(factoryAddress.toHexString());
     factory.address = factoryAddress;
     factory.createdTimestamp = timestamp;
     factory.createdBlock = block;
   }
 
   // Create new contract entity and fill with info
-  let contract = new LlamaLendContract(poolAddress.toHexString());
+  let contract = new Pool(poolAddress.toHexString());
   contract.address = poolAddress;
   contract.factory = factory.id;
   contract.nftContract = nftContract;
@@ -54,7 +53,7 @@ export function handlePoolCreated(event: PoolCreated): void {
   contract.save();
 }
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  let pool = LlamaLendContract.load(event.address.toHexString());
+  let pool = Pool.load(event.address.toHexString());
   if(pool !== null){
     pool.owner = event.params.newOwner;
     pool.save();
@@ -63,26 +62,15 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
 
 export function handleTransfer(event: Transfer): void {
   let loanId = event.params.tokenId;
-  const block = event.block.number;
-  const timestamp = event.block.timestamp;
   const newOwner = event.params.to;
 
   const loan = Loan.load(loanId.toHexString());
 
-  let user = User.load(newOwner.toHexString());
-  // If User doesn't exist, then create a new User entity
-  if (user === null) {
-      user = new User(newOwner.toHexString());
-      user.address = newOwner;
-      user.createdTimestamp = timestamp;
-      user.createdBlock = block;
-  }
   if(loan!.owner === null){
-    loan!.originalOwner = user.address;
+    loan!.originalOwner = newOwner;
   }
-  loan!.owner = user.id;
+  loan!.owner = newOwner;
   // Save and return
-  user.save();
   loan!.save();
 }
 
@@ -94,7 +82,7 @@ export function handleLoanCreated(event: LoanCreated): void {
   const startTime = event.params.startTime;
   const borrowed = event.params.borrowed;
   const block = event.block.number;
-  let pool = LlamaLendContract.load(poolAddress.toHexString());
+  let pool = Pool.load(poolAddress.toHexString());
 
   let loan = new Loan(loanId.toHexString());
   loan.loanId = loanId;
@@ -117,7 +105,7 @@ export function handleLiquidatorAdded(event: LiquidatorAdded): void {
   let liquidator = Liquidator.load(id)
   if(liquidator !== null){
     liquidator.address = liqAddress
-    liquidator.pool = LlamaLendContract.load(pool.toHexString())!.id;
+    liquidator.pool = Pool.load(pool.toHexString())!.id;
     liquidator.save();
   }
 }

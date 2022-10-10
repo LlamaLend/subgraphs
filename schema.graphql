@@ -1,20 +1,20 @@
-type LlamaLendFactory @entity {
+type Factory @entity {
   id: ID!
   count: Int!
   address: Bytes!
-  contracts: [LlamaLendContract!]! @derivedFrom(field: "factory")
+  contracts: [Pool!]! @derivedFrom(field: "factory")
   createdTimestamp: BigInt!
   createdBlock: BigInt!
 }
 
-type LlamaLendContract @entity {
+type Pool @entity {
   id: ID!
   address: Bytes!
   nftContract: Bytes!
   owner: Bytes!
   name: String!
   symbol: String!
-  factory: LlamaLendFactory!
+  factory: Factory!
   loans: [Loan!]! @derivedFrom(field: "pool")
   maxLoanLength: BigInt!
   createdTimestamp: BigInt!
@@ -24,9 +24,9 @@ type LlamaLendContract @entity {
 type Loan @entity {
   id: ID!
   loanId: BigInt!
-  pool: LlamaLendContract!
+  pool: Pool!
   originalOwner: Bytes
-  owner: User
+  owner: Bytes
   nftId: BigInt!
   interest: BigInt!
   borrowed: BigInt!
@@ -36,18 +36,10 @@ type Loan @entity {
   tokenUri: String!
 }
 
-type User @entity {
-  id: ID!
-  address: Bytes!
-  loans: [Loan!]! @derivedFrom(field: "owner")
-  createdTimestamp: BigInt!
-  createdBlock: BigInt!
-}
-
 type Liquidator @entity {
   id: ID!
   address: Bytes!
-  pool: LlamaLendContract!
+  pool: Pool!
   createdTimestamp: BigInt!
   createdBlock: BigInt!
 }

@@ -42,8 +42,9 @@ export function handlePoolCreated(event: PoolCreated): void {
   contract.createdBlock = block;
 
   let contractToCall = LlamaLendToCall.bind(poolAddress)
-  let callResult = contractToCall.maxLoanLength()
-  contract.maxLoanLength = callResult;
+  contract.maxLoanLength = contractToCall.maxLoanLength();
+  contract.name = contractToCall.name();
+  contract.symbol = contractToCall.symbol();
 
   // Start tracking the llamapay contract
   LlamaLend.create(poolAddress);

@@ -12,6 +12,8 @@ type LlamaLendContract @entity {
   address: Bytes!
   nftContract: Bytes!
   owner: Bytes!
+  name: String!
+  symbol: String!
   factory: LlamaLendFactory!
   loans: [Loan!]! @derivedFrom(field: "pool")
   maxLoanLength: BigInt!

@@ -7,7 +7,9 @@ import {
   Transfer,
   LlamaLend as LlamaLendToCall,
   LiquidatorAdded,
-  LiquidatorRemoved
+  LiquidatorRemoved,
+  ChangeLTVCall,
+  ChangeInterestCall
 } from "../generated/templates/LlamaLend/LlamaLend"
 import { Pool, Factory, Loan, Liquidator } from "../generated/schema"
 import {LlamaLend} from "../generated/templates"
@@ -44,6 +46,9 @@ export function handlePoolCreated(event: PoolCreated): void {
   contract.maxLoanLength = contractToCall.maxLoanLength();
   contract.name = contractToCall.name();
   contract.symbol = contractToCall.symbol();
+  contract.ltv = contractToCall.ltv();
+  contract.minimumInterest = contractToCall.minimumInterest();
+  contract.maxVariableInterestPerEthPerSecond = contractToCall.maxVariableInterestPerEthPerSecond();
 
   // Start tracking the llamapay contract
   LlamaLend.create(poolAddress);
@@ -52,10 +57,28 @@ export function handlePoolCreated(event: PoolCreated): void {
   factory.save();
   contract.save();
 }
+
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   let pool = Pool.load(event.address.toHexString());
   if(pool !== null){
     pool.owner = event.params.newOwner;
+    pool.save();
+  }
+}
+
+export function handleChangeLTV(call: ChangeLTVCall): void {
+  let pool = Pool.load(call.to.toHexString());
+  if(pool !== null){
+    pool.ltv = call.inputs._ltv;
+    pool.save();
+  }
+}
+
+export function handleChangeInterest(call: ChangeInterestCall): void {
+  let pool = Pool.load(call.to.toHexString());
+  if(pool !== null){
+    pool.minimumInterest = call.inputs._minimumInterest;
+    pool.maxVariableInterestPerEthPerSecond = call.inputs._maxInterestPerEthPerSecond;
     pool.save();
   }
 }

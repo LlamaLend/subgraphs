@@ -15,8 +15,10 @@ type Pool @entity {
   name: String!
   symbol: String!
   factory: Factory!
-  loans: [Loan!]! @derivedFrom(field: "pool")
   maxLoanLength: BigInt!
+  ltv: BigInt!
+  minimumInterest: BigInt!
+  maxVariableInterestPerEthPerSecond: BigInt!
   createdTimestamp: BigInt!
   createdBlock: BigInt!
 }

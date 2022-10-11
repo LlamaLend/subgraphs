@@ -49,4 +49,9 @@ templates:
           handler: handleLiquidatorAdded
         - event: LiquidatorRemoved(address)
           handler: handleLiquidatorRemoved
+      callHandlers:
+        - function: changeLTV(uint256)
+          handler: handleChangeLTV
+        - function: changeInterest(uint256,uint256)
+          handler: handleChangeInterest
       file: ./src/mapping.ts

@@ -122,20 +122,21 @@ export function handleLoanCreated(event: LoanCreated): void {
 }
 
 export function handleLiquidatorAdded(event: LiquidatorAdded): void {
-  let pool = event.address
+  let pool = event.address.toHexString()
   let liqAddress = event.params.liquidator
-  let id = `${pool}-${liqAddress}`
+  let id = `${pool}-${liqAddress.toHexString()}`
   let liquidator = Liquidator.load(id)
-  if(liquidator !== null){
+  if(liquidator === null){
+    liquidator = new Liquidator(id);
     liquidator.address = liqAddress
-    liquidator.pool = Pool.load(pool.toHexString())!.id;
+    liquidator.pool = Pool.load(pool)!.id;
     liquidator.save();
   }
 }
 
 export function handleLiquidatorRemoved(event: LiquidatorRemoved): void {
-  let pool = event.address
-  let id = `${pool}-${event.params.liquidator}`
+  let pool = event.address.toHexString()
+  let id = `${pool}-${event.params.liquidator.toHexString()}`
   let liquidator = Liquidator.load(id)
   if(liquidator !== null){
     store.remove('Liquidator', id)
